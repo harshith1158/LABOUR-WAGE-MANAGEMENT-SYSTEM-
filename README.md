@@ -1,96 +1,133 @@
-🧾 Contract Worker Wage Sheet – Visakhapatnam Steel Plant
+                                    🧾 Contract Worker Wage Sheet – Visakhapatnam Steel Plant
 
-A web-based system designed for the IT & ERP, Engineering Department of Visakhapatnam Steel Plant to manage contract workers’ wage sheets.
-The platform provides secure login access, automated wage calculations from uploaded Excel sheets, and supports downloading structured wage reports.
+⚡ Quick Info
 
-🚀 Features
+📌 Domain: Enterprise Software – Wage Management
 
-✅ Secure Login System – Role-based access using mobile number + password
-✅ Contract Worker Management – Store and view worker details, job codes, skills, DOB, and contracts
-✅ Attendance & Wage Calculation – Auto-process Excel uploads (attendance + contract master + worker details)
-✅ Excel Download – Export wage sheets in professional .xlsx format
-✅ Group by Contract – View workers grouped by contract for easy analysis
-✅ Modern UI – Clean, professional, and mobile-friendly user interface
+🏢 Use Case: IT & ERP, Engineering Department – Visakhapatnam Steel Plant
 
+🛠 Tech Stack: Node.js, Express, SQLite, ExcelJS, HTML/CSS/JS
+
+🗂 Data Source: Excel sheets (Worker details, Attendance, Contract master)
+
+⬇️ Outputs: Downloadable Excel wage sheets & attendance reports
+
+🔐 Access: Secure login, restricted to authorized users
+
+
+📖 Gist
+
+The Contract Worker Wage Sheet is a full-stack web application designed for the IT & ERP, Engineering Department of Visakhapatnam Steel Plant.
+It streamlines the process of managing worker details, attendance records, and wage calculations with automated Excel integration.
+
+Built with Node.js, Express, SQLite, and ExcelJS, the platform ensures secure access, accuracy in wage processing, and professional reporting for contract workers across multiple contracts.
+
+🚀 Key Features
+
+🔐 Secure Login System → Role-based access using mobile number + password
+
+📑 Worker Data Management → Store & fetch worker details (job code, contract, DOB, skill type)
+
+🗓️ Attendance & Contract Master Upload → Upload Excel sheets directly into the system
+
+🧮 Automated Wage Calculation → Calculates wages by skill type, attendance, and government deductions
+
+📊 Downloadable Excel Reports → Generate neat, professional wage sheets for contractors
+
+📋 Grouped View → View workers grouped by contract, job type, or time period
+
+🖥️ Modern UI → Clean, structured, and professional interface tailored for enterprise use
 🏗️ Tech Stack
 
-Frontend: HTML, CSS, JavaScript
+Frontend:
 
-Backend: Node.js + Express
+HTML, CSS, JavaScript
 
-Database: SQLite (lightweight & file-based)
+Backend:
 
-Excel Handling: excelJS
+Node.js + Express
+
+Database:
+
+SQLite (lightweight file-based DB)
+
+Excel Processing:
+
+ExcelJS for reading & generating .xlsx files
 
 📂 Project Structure
 
 📦 contract-worker-wage-sheet
 ├── backend/
-│   ├── server.js            # Express server
-│   ├── database.js          # SQLite setup
+│   ├── server.js              # Express server & routes
+│   ├── database.js            # SQLite DB connection & schema
 │   ├── routes/
-│   │   ├── workerRoutes.js  # Worker & wage sheet routes
-│   │   └── authRoutes.js    # Login/registration
+│   │   ├── workerRoutes.js    # Worker & wage sheet APIs
+│   │   └── authRoutes.js      # Login & registration APIs
 ├── frontend/
-│   ├── login.html           # Login page
-│   ├── register.html        # Registration page
-│   ├── contract-wage-sheet.html # Wage sheet dashboard
-│   ├── style.css            # UI styling
-│   └── script.js            # Frontend logic
+│   ├── login.html             # Secure login page
+│   ├── register.html          # Registration page
+│   ├── contract-wage.html     # Wage sheet dashboard
+│   ├── style.css              # Frontend styling
+│   └── script.js              # Frontend logic & API calls
 ├── data/
-│   └── workers.db           # SQLite database
+│   └── workers.db             # SQLite database file
 ├── package.json
 └── README.md
+⚙️ Installation & Setup
 
-⚙️ Installation
-1️⃣ Clone the repo
+1️⃣ Clone the repository
+
 git clone https://github.com/your-username/contract-worker-wage-sheet.git
 cd contract-worker-wage-sheet
 
+
 2️⃣ Install dependencies
+
 npm install
 
+
 3️⃣ Start the server
+
 node backend/server.js
 
-4️⃣ Open in browser
-http://localhost:3000
 
-📊 Usage Workflow
+4️⃣ Access the app
+👉 Open your browser at: http://localhost:3000
 
-🔐 Login/Register using mobile number & password
+📊 Workflow
 
-📑 Upload Worker/Attendance Excel files
+🔐 Login/Register with mobile number & password
 
-🧮 System calculates wages based on contract & attendance
+📂 Upload Excel sheets → worker details, attendance, contract master
 
-📂 View grouped worker details by contract
+🧮 System calculates wages → Based on attendance, job type, and deductions
 
-⬇️ Download wage sheet in Excel format
+📊 View grouped data → By job code, contract name, skill type
+
+⬇️ Download Excel wage sheet → Professional report ready for contractors
 
 🔒 Security
 
-Passwords are securely stored (hashed).
+Passwords securely stored with hashing
 
-Restricted access only for authorized department staff.
+Validation checks: no future DOBs, valid email format, proper input formatting
 
-Session/JWT-based login can be enabled for production.
+Access restricted to authorized department staff only
 
 🎯 Future Enhancements
 
-📱 Responsive dashboard with charts/analytics
+📱 Responsive dashboard with analytics & charts
 
-📧 Email/SMS alerts for workers or contractors
-
-📊 Advanced reporting with filters (date, contract, skill)
+📧 Email/SMS notifications for contractors
 
 ☁️ Cloud deployment (Heroku / AWS / Vercel)
 
+🔍 Advanced search & filters (by year, month, job type)
+
 👨‍💻 Author
- J.HARSHITH KUMAR
+
+    JANASWAMI HARSHITH KUMAR 
 📍 Computer Science Engineering Student
 📧 [harshithkumar746@gmail.com]
-🔗 [www.linkedin.com/in/
-harshith-kumar-18295a299]
-
-✨ This project streamlines wage sheet management for contract workers, improving efficiency, transparency, and accuracy at scale.
+🔗 [www.linkedin.com/in/harshith-kumar-18295a299]
