@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>VSP LOGIN PORTAL</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(120deg, #d4fc79, #96e6a1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .form-box {
+      background: white;
+      padding: 30px 40px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      animation: slideUp 0.8s ease-out;
+    }
+
+    /* Title Section */
+    .page-title {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .page-title h1 {
+      font-size: 1.9rem;
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+    }
+    .page-title p {
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #4CAF50;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .error, .success {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .error {
+      background-color: #ffe0e0;
+      color: #c00;
+    }
+
+    .success {
+      background-color: #e0ffe0;
+      color: #070;
+    }
+
+    .register-link {
+      margin-top: 15px;
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .register-link a {
+      color: #4CAF50;
+      font-weight: 600;
+      text-decoration: none;
+      margin-left: 6px;
+      transition: color 0.3s;
+    }
+    .register-link a:hover {
+      color: #388E3C;
+      text-decoration: underline;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-box">
+
+    <div class="page-title">
+      <h1>VSP LOGIN PORTAL</h1>
+      <p>VSP LOGIN AND REGISTRATION PAGE -- IT & ERP DEPARTMENT OF VISHAKAPATNAM STEEL PLANT</p>
+    </div>
+
+    <h2>🔐 Login</h2>
+    <form id="loginForm" novalidate>
+      <input type="text" name="mobile" placeholder="📱 Mobile" required pattern="^\d{10}$" title="Enter a valid 10-digit mobile number" />
+      <input type="password" name="password" placeholder="🔑 Password" required minlength="8" />
+      <button type="submit">Login</button>
+    </form>
+
+    <div id="message"></div>
+
+    <div class="register-link">
+      Don't have an account? <a href="register.html">Register</a>
+    </div>
+  </div>
+
+  <script>
+    function validateMobile(mobile) {
+      return /^\d{10}$/.test(mobile);
+    }
+
+    function validatePassword(password) {
+      // At least 8 chars, 1 uppercase, 1 lowercase, 1 digit, 1 special char
+      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password);
+    }
+
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const form = e.target;
+      const mobile = form.mobile.value.trim();
+      const password = form.password.value;
+
+      const msgBox = document.getElementById("message");
+      msgBox.innerHTML = "";
+
+      // Client validations
+      if (!validateMobile(mobile)) {
+        msgBox.innerHTML = '<div class="error">🚫 Please enter a valid 10-digit mobile number.</div>';
+        return;
+      }
+      if (!validatePassword(password)) {
+        msgBox.innerHTML = '<div class="error">🚫 Password must be at least 8 characters, include uppercase, lowercase, number & special character.</div>';
+        return;
+      }
+
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+      const res = await fetch("/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      if (res.ok) {
+        msgBox.innerHTML = '<div class="success">🎉 Login successful! Redirecting...</div>';
+        setTimeout(() => window.location.href = "wagesheet.html", 1500);
+      } else {
+        const result = await res.json();
+        msgBox.innerHTML = `<div class="error">🚫 ${result.message}</div>`;
+      }
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Welcome | VSP Labour Wage System</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      color: white;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+      text-align: center;
+      max-width: 600px;
+    }
+
+    .btns {
+      display: flex;
+      gap: 30px;
+    }
+
+    button {
+      padding: 15px 35px;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .login-btn {
+      background: #00c9ff;
+      color: #003344;
+    }
+
+    .register-btn {
+      background: #92fe9d;
+      color: #003300;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🔧 Labour Wage Management System</h1>
+  <p>Welcome to VSP's internal portal. Proceed to login or register to access worker attendance and wage sheet modules.</p>
+
+  <div class="btns">
+    <button class="login-btn" onclick="window.location.href='login.html'">🔐 Login</button>
+    <button class="register-btn" onclick="window.location.href='register.html'">📝 Register</button>
+  </div>
+
+</body>
+</html>

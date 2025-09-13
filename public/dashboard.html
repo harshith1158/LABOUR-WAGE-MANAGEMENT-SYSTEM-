@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard | VSP Portal</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,600&display=swap" />
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #007bff;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+    }
+    .container {
+      padding: 30px;
+      text-align: center;
+    }
+    .btn {
+      padding: 15px 30px;
+      font-size: 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 30px;
+    }
+    .btn:hover {
+      background-color: #0056b3;
+    }
+    .logout {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      background-color: #dc3545;
+    }
+    .logout:hover {
+      background-color: #a71d2a;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Welcome to VSP Portal
+    <button class="btn logout" onclick="logout()">🚪 Logout</button>
+  </header>
+  <div class="container">
+    <p>Select a module to proceed:</p>
+    <button class="btn" onclick="goToSheet()">📄 View Wage Sheet</button>
+    <!-- Add this in the container div -->
+<div class="menu">
+  <button class="btn" onclick="goToSheet()">📄 View Wage Sheet</button>
+</div>
+
+  </div>
+
+  <script>
+    function goToSheet() {
+      window.location.href = 'wagesheet.html';
+    }
+    function logout() {
+  fetch('/logout', { method: 'POST' })
+    .then(() => window.location.href = 'thankyou.html');
+}
+
+  </script>
+</body>
+</html>

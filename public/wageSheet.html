@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Wage Sheet</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:400,600&display=swap">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f0f4f8;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background: #007bff;
+      color: white;
+      padding: 20px;
+      font-size: 22px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .container {
+      padding: 40px;
+    }
+    select, button {
+      padding: 10px;
+      margin: 10px 10px 30px 0;
+      font-size: 14px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      padding: 12px;
+      border: 1px solid #ccc;
+      text-align: center;
+    }
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+    .btn-download {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .btn-download:hover {
+      background: #1e7e34;
+    }
+    .logout {
+      padding: 10px;
+      background-color: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .logout:hover {
+      background-color: #a71d2a;
+    }
+    #totalWageRow {
+      font-weight: bold;
+      background-color: #f1f1f1;
+    }
+    #toast {
+      visibility: hidden;
+      min-width: 250px;
+      background-color: #333;
+      color: #fff;
+      text-align: center;
+      border-radius: 4px;
+      padding: 16px;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1;
+    }
+    #toast.show {
+      visibility: visible;
+      animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    }
+    @keyframes fadein {
+      from { bottom: 0; opacity: 0; }
+      to { bottom: 30px; opacity: 1; }
+    }
+    @keyframes fadeout {
+      from { bottom: 30px; opacity: 1; }
+      to { bottom: 0; opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    Contract Wage Sheet
+    <button class="logout" onclick="logout()">🚪 Logout</button>
+  </header>
+  <div class="container">
+    <select id="jobSelect"></select>
+    <select id="contractSelect"></select>
+    <select id="yearSelect">
+      <option value="2024">2024</option>
+      <option value="2025">2025</option>
+    </select>
+    <select id="monthSelect">
+      <option value="01">January</option>
+      <option value="02">February</option>
+      <option value="03">March</option>
+      <option value="04">April</option>
+      <option value="05">May</option>
+      <option value="06">June</option>
+      <option value="07">July</option>
+      <option value="08">August</option>
+      <option value="09">September</option>
+      <option value="10">October</option>
+      <option value="11">November</option>
+      <option value="12">December</option>
+    </select>
+    <button onclick="generateWageSheet()" id="generateBtn">Generate</button>
+<input type="text" id="searchInput" placeholder="🔍 Search by name, Aadhar ID or contractor..." style="padding: 10px; width: 100%; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ccc;" onkeyup="filterTable()">
+
+    <table id="wageTable" style="display: none;">
+      <thead>
+        <tr>
+          <th>Adhar ID</th>
+          <th>Name</th>
+          <th>Job Code</th>
+          <th>Contractor</th>
+          <th>Days Present</th>
+          <th>Wage Rate</th>
+          <th>Total Wage</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+      <tfoot>
+          
+        </tr>
+      </tfoot>
+    </table>
+
+    <button id="downloadBtn" class="btn-download" style="display: none;" onclick="downloadExcel()">⬇️ Download Excel</button>
+  </div>
+
+  <div id="toast"></div>
+
+  <script>
+    function showToast(message, isSuccess = true) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.style.backgroundColor = isSuccess ? "#28a745" : "#dc3545";
+      toast.className = "show";
+      setTimeout(() => { toast.className = toast.className.replace("show", ""); }, 3000);
+    }
+
+   async function populateDropdowns() {
+    const jobCodes = await fetch('/api/jobcodes').then(res => res.json());
+    const jobSelect = document.getElementById('jobSelect');
+    jobSelect.innerHTML = '<option value="">Select Job Code</option>';
+    jobCodes.forEach(j => {
+      const option = document.createElement('option');
+      option.value = j;
+      option.text = `Job Code: ${j}`;
+      jobSelect.appendChild(option);
+    });
+  }
+
+  // 🔄 When job code is selected, autofill contract + year/month
+  document.getElementById('jobSelect').addEventListener('change', async (e) => {
+    const jobCode = e.target.value;
+    if (!jobCode) return;
+
+    const response = await fetch(`/api/job-info?jobCode=${jobCode}`);
+    const result = await response.json();
+
+    // Set contractor
+    const contractorSelect = document.getElementById('contractSelect');
+    contractorSelect.innerHTML = `<option value="${result.contractor}">${result.contractor}</option>`;
+
+    // Set year and month
+    const yearSelect = document.getElementById('yearSelect');
+    const monthSelect = document.getElementById('monthSelect');
+    const uniqueYears = new Set();
+    const uniqueMonths = new Set();
+
+    result.dates.forEach(d => {
+      uniqueYears.add(d.year);
+      uniqueMonths.add(d.month);
+    });
+
+    yearSelect.innerHTML = '';
+    [...uniqueYears].sort().forEach(y => {
+      const opt = document.createElement('option');
+      opt.value = y;
+      opt.textContent = y;
+      yearSelect.appendChild(opt);
+    });
+
+    monthSelect.innerHTML = '';
+    [...uniqueMonths].sort().forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m.padStart(2, '0');
+      opt.textContent = new Date(0, m - 1).toLocaleString('default', { month: 'long' });
+      monthSelect.appendChild(opt);
+    });
+  });
+    function filterTable() {
+  const query = document.getElementById('searchInput').value.toLowerCase();
+  const rows = document.querySelectorAll('#wageTable tbody tr');
+
+  rows.forEach(row => {
+    const rowText = row.textContent.toLowerCase();
+    row.style.display = rowText.includes(query) ? '' : 'none';
+  });
+}
+
+
+     async function generateWageSheet() {
+  const jobCode = document.getElementById('jobSelect').value;
+  const contractorName = document.getElementById('contractSelect').value;
+  const year = document.getElementById('yearSelect').value;
+  const month = document.getElementById('monthSelect').value;
+
+  try {
+    const response = await fetch('/api/wages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ jobCode, contractorName, year, month })
+    });
+
+    const data = await response.json();
+    console.log('Wage API Response:', data);
+
+    if (!Array.isArray(data)) {
+      alert("❌ Wage sheet error: " + (data.error || 'Invalid response'));
+      return;
+    }
+
+    const table = document.getElementById('wageTable');
+    const tbody = table.querySelector('tbody');
+    tbody.innerHTML = '';
+
+    let grandTotal = 0;
+
+    data.forEach(row => {
+      const tr = document.createElement('tr');
+      Object.values(row).forEach(val => {
+        const td = document.createElement('td');
+        td.textContent = val;
+        tr.appendChild(td);
+      });
+      tbody.appendChild(tr);
+      grandTotal += row.total_wage || 0;
+    });
+
+    if (data.length > 0) {
+      const totalRow = document.createElement('tr');
+      totalRow.innerHTML = `
+        <td colspan="6" style="text-align:right; font-weight:bold;">Grand Total:</td>
+        <td style="font-weight:bold;">₹ ${grandTotal.toFixed(2)}</td>
+      `;
+      tbody.appendChild(totalRow);
+    }
+
+    table.style.display = data.length ? 'table' : 'none';
+    document.getElementById('downloadBtn').style.display = data.length ? 'inline-block' : 'none';
+
+  } catch (error) {
+    console.error("❌ Error in fetching wage data:", error);
+    alert("Server error: Could not fetch wage data.");
+  }
+}
+
+    function downloadExcel() {
+      const jobCode = document.getElementById('jobSelect').value;
+      const contractorName = document.getElementById('contractSelect').value;
+      const year = document.getElementById('yearSelect').value;
+      const month = document.getElementById('monthSelect').value;
+
+      const url = `/api/wages/export?jobCode=${jobCode}&contractorName=${encodeURIComponent(contractorName)}&year=${year}&month=${month}`;
+      window.open(url, '_blank');
+      showToast("📤 Exporting Excel...");
+    }
+
+    function logout() {
+      fetch('/logout', { method: 'POST' }).then(() => window.location.href = 'thankyou.html');
+    }
+
+    populateDropdowns();
+  </script>
+</body>
+</html>

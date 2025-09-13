@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>VSP REGISTRATION PORTAL</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #74ebd5, #acb6e5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    .form-box {
+      background: #fff;
+      padding: 35px 45px;
+      border-radius: 15px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      width: 100%;
+      max-width: 450px;
+      text-align: center;
+      animation: slideUp 0.8s ease-out;
+    }
+
+    /* Title Section */
+    .page-title {
+      margin-bottom: 20px;
+      color: #333;
+    }
+    .page-title h1 {
+      font-size: 1.9rem;
+      margin: 0;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+    }
+    .page-title p {
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+      color: #444;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #5c67f2;
+      border: none;
+      color: white;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #4953d2;
+    }
+
+    .error, .success {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+
+    .error {
+      background-color: #ffdcdc;
+      color: #b30000;
+    }
+
+    .success {
+      background-color: #d9fdd3;
+      color: #2e7d32;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="form-box">
+
+    <div class="page-title">
+      <h1>VSP REGISTRATION PORTAL</h1>
+      <p>VSP LOGIN AND REGISTRATION PAGE -- IT & ERP DEPARTMENT OF VISHAKAPATNAM STEEL PLANT</p>
+    </div>
+
+    <h2>📝 Register</h2>
+    <form id="registerForm" novalidate>
+      <input type="text" name="name" placeholder="👤 Name" required minlength="2" />
+      <input type="email" name="email" placeholder="📧 Email" required />
+      <input type="text" name="mobile" placeholder="📱 Mobile" required pattern="^\d{10}$" title="Enter a valid 10-digit mobile number" />
+      <input type="date" name="dob" id="dob" required />
+      <input type="password" name="password" placeholder="🔒 Password" required />
+      <input type="password" name="confirmPassword" placeholder="🔒 Confirm Password" required />
+      <button type="submit">Register</button>
+    </form>
+    <div class="register-link" style="margin-top: 15px;">
+  Already have an account? <a href="login.html">Login</a>
+</div>
+
+
+    <div id="message"></div>
+  </div>
+
+  <script>
+    document.getElementById('dob').max = new Date().toISOString().split('T')[0];
+
+    function validateName(name) {
+      return /^[a-zA-Z\s]{2,}$/.test(name);
+    }
+
+    function validateEmail(email) {
+      // Simple email regex
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    function validateMobile(mobile) {
+      return /^\d{10}$/.test(mobile);
+    }
+
+    function validatePassword(password) {
+      // At least 8 chars, 1 uppercase, 1 lowercase, 1 digit, 1 special char
+      return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/.test(password);
+    }
+
+    function validateDOB(dob) {
+      if (!dob) return false;
+      const date = new Date(dob);
+      const now = new Date();
+      return date <= now; // Not in future
+    }
+
+    document.getElementById("registerForm").addEventListener("submit", async e => {
+      e.preventDefault();
+      const form = e.target;
+      const data = Object.fromEntries(new FormData(form));
+      const msgBox = document.getElementById("message");
+      msgBox.innerHTML = "";
+
+      if (!validateName(data.name)) {
+        msgBox.innerHTML = '<div class="error">❗ Please enter a valid name (letters and spaces only, min 2 characters).</div>';
+        return;
+      }
+      if (!validateEmail(data.email)) {
+        msgBox.innerHTML = '<div class="error">❗ Please enter a valid email address.</div>';
+        return;
+      }
+      if (!validateMobile(data.mobile)) {
+        msgBox.innerHTML = '<div class="error">❗ Please enter a valid 10-digit mobile number.</div>';
+        return;
+      }
+      if (!validateDOB(data.dob)) {
+        msgBox.innerHTML = '<div class="error">❗ Please select a valid date of birth (not in the future).</div>';
+        return;
+      }
+      if (!validatePassword(data.password)) {
+        msgBox.innerHTML = '<div class="error">❗ Password must be at least 8 characters, include uppercase, lowercase, number & special character.</div>';
+        return;
+      }
+      if (data.password !== data.confirmPassword) {
+        msgBox.innerHTML = '<div class="error">❗ Passwords do not match!</div>';
+        return;
+      }
+
+      const res = await fetch("/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      if (res.ok) {
+        msgBox.innerHTML = '<div class="success">✅ Registered successfully!</div>';
+        setTimeout(() => window.location.href = "login.html", 1500);
+      } else {
+        const result = await res.json();
+        msgBox.innerHTML = `<div class="error">❌ ${result.message}</div>`;
+      }
+    });
+  </script>
+
+</body>
+</html>
