@@ -2,8 +2,10 @@ services:
   - type: web
     name: labour-wage-management-system
     runtime: node
-    buildCommand: npm install
-    startCommand: node server.js
+    buildCommand: npm run build
+    startCommand: npm start
     envVars:
+      - key: NODE_VERSION
+        value: 18.20.0
       - key: NODE_ENV
         value: production
