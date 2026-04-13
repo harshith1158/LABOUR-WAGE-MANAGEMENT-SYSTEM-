@@ -8,7 +8,7 @@ const path = require('path');
 const session = require('express-session');
 const ExcelJS = require('exceljs');
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // Database setup
 const db = new sqlite3.Database('./jobs.db');

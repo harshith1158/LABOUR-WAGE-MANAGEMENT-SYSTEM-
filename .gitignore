@@ -7,3 +7,14 @@ uploads/
 # Database files
 *.db
 *.sql
+
+# Environment variables
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
