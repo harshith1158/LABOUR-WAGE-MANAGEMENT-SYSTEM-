@@ -1,11 +1,14 @@
 {
-  "name": "v",
+  "name": "labour-wage-management-system",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npm install && npm rebuild sqlite3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   },
   "keywords": [],
   "author": "",
