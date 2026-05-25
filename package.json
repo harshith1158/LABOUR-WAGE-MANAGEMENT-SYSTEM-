@@ -5,10 +5,10 @@
   "scripts": {
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm install && npm rebuild sqlite3"
+    "build": "npm ci --omit=dev && npm rebuild sqlite3"
   },
   "engines": {
-    "node": ">=18.0.0"
+    "node": ">=20 <23"
   },
   "keywords": [],
   "author": "",

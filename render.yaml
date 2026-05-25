@@ -2,10 +2,10 @@ services:
   - type: web
     name: labour-wage-management-system
     runtime: node
-    buildCommand: npm run build
+    buildCommand: npm ci --omit=dev && npm rebuild sqlite3
     startCommand: npm start
     envVars:
       - key: NODE_VERSION
-        value: 18.20.0
+        value: 20.19.0
       - key: NODE_ENV
         value: production
