@@ -1,9 +1,17 @@
 const sqlite3 = require('sqlite3').verbose();
 const xlsx = require('xlsx');
+const path = require('path');
+const fs = require('fs');
 
-const db = new sqlite3.Database('./jobs.db', (err) => {
+const dbPath = process.env.DB_PATH || path.join(__dirname, 'jobs.db');
+const dbDir = path.dirname(dbPath);
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+}
+
+const db = new sqlite3.Database(dbPath, (err) => {
   if (err) return console.error("❌ Failed to open DB:", err.message);
-  console.log("📦 Connected to SQLite database: jobs.db");
+  console.log(`📦 Connected to SQLite database: ${dbPath}`);
 });
 
 // ----------- Date Helpers ------------

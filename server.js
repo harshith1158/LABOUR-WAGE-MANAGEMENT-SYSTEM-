@@ -11,7 +11,12 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Database setup
-const db = new sqlite3.Database(path.join(__dirname, 'jobs.db'));
+const dbPath = process.env.DB_PATH || path.join(__dirname, 'jobs.db');
+const dbDir = path.dirname(dbPath);
+if (!fs.existsSync(dbDir)) {
+  fs.mkdirSync(dbDir, { recursive: true });
+}
+const db = new sqlite3.Database(dbPath);
 
 // Ensure required runtime directories exist in deployed environments.
 const uploadsDir = path.join(__dirname, 'uploads');
