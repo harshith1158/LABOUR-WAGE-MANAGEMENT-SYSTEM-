@@ -11,7 +11,67 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Database setup
-const db = new sqlite3.Database('./jobs.db');
+const db = new sqlite3.Database(path.join(__dirname, 'jobs.db'));
+
+// Ensure required runtime directories exist in deployed environments.
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// Ensure schema exists before handling requests.
+db.serialize(() => {
+  db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT UNIQUE,
+      mobile TEXT UNIQUE,
+      dob TEXT,
+      password TEXT NOT NULL
+    )
+  `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS jobs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      job_cd TEXT,
+      contractor_name TEXT,
+      contractor_address TEXT,
+      job_start_dt TEXT,
+      job_end_dt TEXT,
+      job_desc TEXT
+    )
+  `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS workers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      job_cd TEXT,
+      adhar_id TEXT,
+      gpass_no TEXT,
+      worker_name TEXT,
+      worker_skill TEXT,
+      dob TEXT
+    )
+  `);
+
+  db.run(`
+    CREATE TABLE IF NOT EXISTS attendance (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      w_date TEXT,
+      adhar_id TEXT,
+      in_time TEXT,
+      out_time TEXT,
+      device_name_in TEXT,
+      device_name_out TEXT,
+      job_cd TEXT,
+      contractor_name TEXT,
+      year TEXT,
+      month TEXT
+    )
+  `);
+});
 
 // Middleware setup
 app.use(session({
@@ -146,6 +206,11 @@ app.post('/login', (req, res) => {
   }
 
   db.get(`SELECT * FROM users WHERE mobile = ?`, [mobile], (err, user) => {
+    if (err) {
+      console.error('Login query error:', err.message);
+      return res.status(500).json({ message: 'Login failed' });
+    }
+
     if (!user) {
       return res.status(401).json({ message: 'User not found' });
     }
@@ -184,6 +249,11 @@ app.post('/register', (req, res) => {
 
   // Check if user exists
   db.get(`SELECT * FROM users WHERE mobile = ? OR email = ?`, [mobile, email], (err, row) => {
+    if (err) {
+      console.error('Register pre-check error:', err.message);
+      return res.status(500).json({ message: 'Registration failed' });
+    }
+
     if (row) {
       return res.status(409).json({ message: 'Mobile or email already registered' });
     }
@@ -194,6 +264,7 @@ app.post('/register', (req, res) => {
     `);
     stmt.run(name, email, mobile, dob, password, function (err) {
       if (err) {
+        console.error('Register insert error:', err.message);
         return res.status(500).json({ message: 'Registration failed' });
       }
       return res.status(201).json({ message: 'Registered successfully' });

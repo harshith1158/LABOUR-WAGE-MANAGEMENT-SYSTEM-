@@ -187,7 +187,7 @@
 
       if (res.ok) {
         msgBox.innerHTML = '<div class="success">🎉 Login successful! Redirecting...</div>';
-        setTimeout(() => window.location.href = "wagesheet.html", 1500);
+        setTimeout(() => window.location.href = "wageSheet.html", 1500);
       } else {
         const result = await res.json();
         msgBox.innerHTML = `<div class="error">🚫 ${result.message}</div>`;
