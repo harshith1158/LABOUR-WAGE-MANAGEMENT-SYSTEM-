@@ -9,10 +9,15 @@ if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
 
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) return console.error("❌ Failed to open DB:", err.message);
-  console.log(`📦 Connected to SQLite database: ${dbPath}`);
-});
+// Use the shared db instance from the module if available, or open directly.
+let db;
+try {
+  db = require('./database');
+} catch (e) {
+  db = new sqlite3.Database(dbPath, (err) => {
+    if (err) return console.error('❌ Failed to open DB:', err.message);
+  });
+}
 
 // ----------- Date Helpers ------------
 function formatDate(excelDate) {
@@ -43,7 +48,7 @@ function importExcel() {
     console.log("🧹 Old data cleared");
 
     // ---------------- JOBS ----------------
-    const jobBook = xlsx.readFile('./contract master (2).xlsx');
+    const jobBook = xlsx.readFile(path.join(__dirname, 'contract master (2).xlsx'));
     const jobs = xlsx.utils.sheet_to_json(jobBook.Sheets[jobBook.SheetNames[0]]);
     const insertJobs = db.prepare(`
       INSERT INTO jobs (job_cd, contractor_name, contractor_address, job_start_dt, job_end_dt, job_desc)
@@ -63,7 +68,7 @@ function importExcel() {
     console.log("✅ Contract Master imported");
 
     // ---------------- WORKERS ----------------
-    const workerBook = xlsx.readFile('./workers details.xlsx');
+    const workerBook = xlsx.readFile(path.join(__dirname, 'workers details.xlsx'));
     const workers = xlsx.utils.sheet_to_json(workerBook.Sheets[workerBook.SheetNames[0]]);
     const insertWorkers = db.prepare(`
       INSERT INTO workers (job_cd, adhar_id, gpass_no, worker_name, worker_skill, dob)
@@ -83,7 +88,7 @@ function importExcel() {
     console.log("✅ Workers imported");
 
     // ---------------- ATTENDANCE ----------------
-    const attendanceBook = xlsx.readFile('./attendance (1).xlsx');
+    const attendanceBook = xlsx.readFile(path.join(__dirname, 'attendance (1).xlsx'));
     const attendance = xlsx.utils.sheet_to_json(attendanceBook.Sheets[attendanceBook.SheetNames[0]]);
     const insertAttendance = db.prepare(`
       INSERT INTO attendance (w_date, adhar_id, in_time, out_time, device_name_in, device_name_out, year, month)
@@ -109,4 +114,28 @@ function importExcel() {
   });
 }
 
-importExcel();
+// Seed only if jobs table is empty (safe to call on every server startup).
+function seedIfEmpty(callback) {
+  db.get('SELECT COUNT(*) AS c FROM jobs', (err, row) => {
+    if (err) {
+      console.error('❌ Seed check failed:', err.message);
+      if (callback) callback(err);
+      return;
+    }
+    if (row.c === 0) {
+      console.log('📥 Empty DB detected — seeding from Excel files...');
+      importExcel();
+      if (callback) callback(null);
+    } else {
+      console.log(`📦 DB already has ${row.c} jobs — skipping seed.`);
+      if (callback) callback(null);
+    }
+  });
+}
+
+// Run directly: node importExcel.js
+if (require.main === module) {
+  importExcel();
+}
+
+module.exports = { importExcel, seedIfEmpty };

@@ -78,6 +78,12 @@ db.serialize(() => {
   `);
 });
 
+// Auto-seed jobs/workers/attendance from committed Excel files if DB is empty.
+const { seedIfEmpty } = require('./importExcel');
+seedIfEmpty((err) => {
+  if (err) console.error('⚠️  Auto-seed failed:', err.message);
+});
+
 // Middleware setup
 app.use(session({
   secret: 'vsp_super_secure_key',
